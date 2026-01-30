@@ -15,14 +15,10 @@ export async function getUsers() {
       },
       orderBy: {
         createdAt: 'desc'
-      },
-      cacheStrategy: {
-        ttl: 60, // Cache is fresh for 60 seconds
-        tags: ["users_list"], // Tag for cache invalidation
       }
 
     });
-    
+
     return users;
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -50,13 +46,9 @@ export async function getPosts(limit = 5) {
       orderBy: {
         createdAt: 'desc'
       },
-      take: limit,
-      cacheStrategy: {
-        swr: 120, // Serve stale data for up to 120 seconds while revalidating
-        tags: ["posts_list"], // Tag for cache invalidation
-      }
+      take: limit
     });
-    
+
     return posts;
   } catch (error) {
     console.error('Error fetching posts:', error);
@@ -83,18 +75,13 @@ export async function getUserById(id: string) {
         _count: {
           select: { comments: true, posts: true }
         },
-      },
-      cacheStrategy: {
-        ttl: 30,    // Fresh for 30 seconds
-        swr: 60,    // Then stale but acceptable for 60 more seconds
-        tags: [`user_${id}`], // User-specific tag
       }
     });
-    
+
     if (!user) {
       throw new Error('User not found');
     }
-    
+
     return user;
   } catch (error) {
     console.error(`Error fetching user with ID ${id}:`, error);
@@ -107,7 +94,7 @@ export async function createUser({ email, name }: { email: string; name?: string
   if (!email) {
     throw new Error('Email is required');
   }
-  
+
   try {
     const user = await prisma.user.create({
       data: {
@@ -115,47 +102,47 @@ export async function createUser({ email, name }: { email: string; name?: string
         name,
       },
     });
-    
+
     // Revalidate the home page to show the new user
     revalidatePath('/');
-    
+
     return user;
   } catch (error: any) {
     // Handle duplicate email error
     if (error.code === 'P2002') {
       throw new Error('A user with this email already exists');
     }
-    
+
     throw new Error('Failed to create user');
   }
 }
 
 // Post actions
-export async function createPost({ 
-  title, 
-  content, 
-  authorId, 
-  published = false 
-}: { 
-  title: string; 
-  content?: string; 
-  authorId: string; 
-  published?: boolean 
+export async function createPost({
+  title,
+  content,
+  authorId,
+  published = false
+}: {
+  title: string;
+  content?: string;
+  authorId: string;
+  published?: boolean
 }) {
   if (!title || !authorId) {
     throw new Error('Title and author are required');
   }
-  
+
   try {
     // Ensure the author exists
     const authorExists = await prisma.user.findUnique({
       where: { id: authorId }
     });
-    
+
     if (!authorExists) {
       throw new Error('Author not found');
     }
-    
+
     const post = await prisma.post.create({
       data: {
         title,
@@ -169,10 +156,10 @@ export async function createPost({
         author: true
       }
     });
-    
+
     // Revalidate the home page to show the new post
     revalidatePath('/');
-    
+
     return post;
   } catch (error) {
     console.error('Error creating post:', error);
@@ -181,37 +168,37 @@ export async function createPost({
 }
 
 // Comment actions
-export async function createComment({ 
-  content, 
-  postId, 
-  authorId 
-}: { 
-  content: string; 
-  postId: string; 
-  authorId: string 
+export async function createComment({
+  content,
+  postId,
+  authorId
+}: {
+  content: string;
+  postId: string;
+  authorId: string
 }) {
   if (!content || !postId || !authorId) {
     throw new Error('Content, post, and author are required');
   }
-  
+
   try {
     // Ensure both the post and author exist
     const postExists = await prisma.post.findUnique({
       where: { id: postId }
     });
-    
+
     const authorExists = await prisma.user.findUnique({
       where: { id: authorId }
     });
-    
+
     if (!postExists) {
       throw new Error('Post not found');
     }
-    
+
     if (!authorExists) {
       throw new Error('Author not found');
     }
-    
+
     const comment = await prisma.comment.create({
       data: {
         content,
@@ -227,7 +214,7 @@ export async function createComment({
         post: true
       }
     });
-    
+
     // Revalidate the home page to show the new comment
     revalidatePath('/');
 
@@ -237,5 +224,5 @@ export async function createComment({
     throw error;
   }
 
-   
+
 }
