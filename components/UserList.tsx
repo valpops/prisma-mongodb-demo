@@ -16,7 +16,7 @@ interface UserListProps {
   initialUsers: UserWithCounts[];
 }
 
-export default function UserList({ initialUsers }: UserListProps) {  
+export default function UserList({ initialUsers }: UserListProps) {
   return (
     <Card className="shadow-sm bg-white overflow-hidden border-0 pt-0">
       <CardHeader className="bg-blue-50 border-b px-6 py-5 rounded-none">
@@ -40,11 +40,11 @@ export default function UserList({ initialUsers }: UserListProps) {
                   </div>
                   <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
                     <div className="flex items-center bg-gray-100 px-3 py-1 rounded-full">
-                      <span className="font-medium mr-1">Posts:</span> 
+                      <span className="font-medium mr-1">Posts:</span>
                       <span className="text-blue-600 font-medium">{user._count?.posts || 0}</span>
                     </div>
                     <div className="flex items-center bg-gray-100 px-3 py-1 rounded-full">
-                      <span className="font-medium mr-1">Comments:</span> 
+                      <span className="font-medium mr-1">Comments:</span>
                       <span className="text-blue-600 font-medium">{user._count?.comments || 0}</span>
                     </div>
                   </div>

@@ -88,4 +88,8 @@ Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## MY Comments (Sher)
 npx prisma init
 npx prisma generate
+## IF starting from scratch:
+npx shadcn@latest init
+npx shadcn@latest add button card input label sonner
+##
 ##
