@@ -25,25 +25,25 @@ interface PostListProps {
 }
 
 export default function PostList({ initialPosts }: PostListProps) {
-  const [commentContents, setCommentContents] = useState<{[key: string]: string}>({});
+  const [commentContents, setCommentContents] = useState<{ [key: string]: string }>({});
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<string | null>(null);
   const router = useRouter();
-  
+
   const handleCommentChange = (postId: string, content: string) => {
     setCommentContents(prev => ({
       ...prev,
       [postId]: content
     }));
   };
-  
+
   const handleSubmitComment = async (postId: string, authorId: string) => {
     const content = commentContents[postId];
     if (!content) {
       toast.error("Comment cannot be empty");
       return;
     }
-    
+
     setSubmitting(postId);
     try {
       await createComment({
@@ -51,16 +51,16 @@ export default function PostList({ initialPosts }: PostListProps) {
         postId,
         authorId
       });
-      
+
       // Clear the input
       setCommentContents(prev => ({
         ...prev,
         [postId]: ''
       }));
-      
+
       toast.success("Comment added successfully");
       router.refresh();
-      
+
     } catch (error: any) {
       console.error('Error adding comment:', error);
       toast.error(error.message || "Failed to add comment");
@@ -68,11 +68,11 @@ export default function PostList({ initialPosts }: PostListProps) {
       setSubmitting(null);
     }
   };
-  
+
   const toggleComments = (postId: string) => {
     setExpandedPost(expandedPost === postId ? null : postId);
   };
-  
+
   return (
     <Card className="shadow-sm bg-white overflow-hidden border-0 pt-0">
       <CardHeader className="bg-green-50 border-b px-6 py-5 rounded-none">
@@ -95,7 +95,7 @@ export default function PostList({ initialPosts }: PostListProps) {
                     )}
                   </div>
                   <div className="text-xs text-gray-500 mt-2">
-                    By <span className="font-medium">{post.author.name || post.author.email}</span> • 
+                    By <span className="font-medium">{post.author.name || post.author.email}</span> •
                     <span className="ml-1">{formatDistance(new Date(post.createdAt), new Date(), { addSuffix: true })}</span>
                   </div>
                 </CardHeader>
@@ -103,17 +103,17 @@ export default function PostList({ initialPosts }: PostListProps) {
                   <p className="text-gray-700 leading-relaxed">{post.content || 'No content'}</p>
                 </CardContent>
                 <CardFooter className="flex flex-col items-start pt-0 pb-4 px-5 border-t bg-gray-50">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => toggleComments(post.id)}
                     className="px-0 text-xs text-green-700 hover:bg-transparent hover:text-green-800 hover:underline"
                   >
                     <span className="font-medium mr-1">{post._count.comments}</span>
-                    {post._count.comments === 1 ? 'comment' : 'comments'} • 
+                    {post._count.comments === 1 ? 'comment' : 'comments'} •
                     <span className="ml-1">{expandedPost === post.id ? 'Hide' : 'Show'}</span>
                   </Button>
-                  
+
                   {expandedPost === post.id && (
                     <div className="w-full mt-4 space-y-4">
                       {post.comments.length > 0 ? (
@@ -130,7 +130,7 @@ export default function PostList({ initialPosts }: PostListProps) {
                       ) : (
                         <div className="text-sm text-gray-500 mb-3 italic">No comments yet</div>
                       )}
-                      
+
                       <div className="flex gap-2">
                         <Input
                           placeholder="Add a comment..."
@@ -138,7 +138,7 @@ export default function PostList({ initialPosts }: PostListProps) {
                           onChange={(e) => handleCommentChange(post.id, e.target.value)}
                           className="h-10 text-sm border-gray-300 focus:border-green-500 focus:ring-green-500"
                         />
-                        <Button 
+                        <Button
                           size="sm"
                           disabled={submitting === post.id || !commentContents[post.id]}
                           onClick={() => handleSubmitComment(post.id, post.author.id)}
